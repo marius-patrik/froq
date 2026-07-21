@@ -3,7 +3,7 @@ pub mod find_protoc;
 use anyhow::Context;
 use std::path::{Path, PathBuf};
 use std::process::{Command, Stdio};
-use std::{fs, iter};
+use std::{env, fs, iter};
 
 /// Find the protoc well-known types include directory.
 ///
@@ -112,12 +112,26 @@ impl XaiProtoBuilder {
             );
         }
 
+        // `/dev/stdout` and `/dev/null` are Unix-only device paths; on Windows
+        // protoc aborts with "No such file or directory". Route both through real
+        // files under OUT_DIR (always writable from a build script) and read the
+        // dependency manifest back from disk instead of from stdout. protoc
+        // echoes the descriptor path verbatim as the make-rule target, so the
+        // parsing below stays identical on every host.
+        let out_dir = PathBuf::from(env::var("OUT_DIR").context("OUT_DIR not set")?);
+        let dep_path = out_dir.join("xai-proto-build-deps.d");
+        let desc_path = out_dir.join("xai-proto-build-descriptor.bin");
+        let desc_target = desc_path.to_str().context("descriptor path not UTF-8")?;
+
         // Can only process one input file when using --dependency_out=FILE.
         for proto in protos {
             let mut command = Command::new(protoc.unwrap_or(Path::new("protoc")));
             command
-                .arg("--dependency_out=/dev/stdout")
-                .arg("--descriptor_set_out=/dev/null");
+                .arg(format!(
+                    "--dependency_out={}",
+                    dep_path.to_str().context("dependency path not UTF-8")?
+                ))
+                .arg(format!("--descriptor_set_out={desc_target}"));
 
             // Add protoc's well-known types include directory first (if found).
             // This is needed for Bazel sandboxed builds where protoc and its
@@ -143,14 +157,14 @@ impl XaiProtoBuilder {
                 return Err(anyhow::anyhow!("protoc command failed"));
             }
 
-            let output =
-                String::from_utf8(output.stdout).context("protoc command output not UTF-8")?;
+            let output = fs::read_to_string(&dep_path)
+                .context("protoc dependency output not readable")?;
 
             let mut lines = output.lines();
             let first_line = lines.next().context("protoc command output is empty")?;
-            let prefix = "/dev/null:";
-            let rem = first_line.strip_prefix(prefix).with_context(|| {
-                format!("protoc command output must start with /dev/null: {output:?}")
+            let prefix = format!("{desc_target}:");
+            let rem = first_line.strip_prefix(prefix.as_str()).with_context(|| {
+                format!("protoc command output must start with {prefix} {output:?}")
             })?;
             for line in iter::once(rem).chain(lines) {
                 let line = line.trim();
