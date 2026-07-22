@@ -1,0 +1,43 @@
+[package]
+license = "Apache-2.0"
+name = "froq-agent"
+version = "0.1.0"
+edition.workspace = true
+description = "Agent builder, definition parsing, and system prompt assembly"
+
+[dependencies]
+dunce = { workspace = true }
+froq-hooks = { path = "../froq-hooks" }
+froq-sampling-types = { path = "../froq-sampling-types" }
+froq-tools = { path = "../froq-tools" }
+froq-tty-utils = { workspace = true }
+froq-token-estimation = { workspace = true }
+minijinja = { version = "2", features = ["custom_syntax"] }
+git2 = { version = "0.20", default-features = false, features = ["vendored-libgit2"] }
+regex = { workspace = true }
+serde = { workspace = true }
+serde_yaml = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true, features = ["rt", "macros", "sync"] }
+tracing = { workspace = true }
+chrono = { workspace = true }
+ignore = { workspace = true }
+dirs = "6"
+froq-config = { workspace = true }
+sha2 = { workspace = true }
+strum = { workspace = true }
+thiserror = { workspace = true }
+zeroize = "1"
+froq-tool-types.workspace = true
+
+[features]
+default = []
+default-bazel = []
+
+[dev-dependencies]
+tempfile = { workspace = true }
+serde_json = { workspace = true }
+serial_test = { workspace = true }
+
+[lints]
+workspace = true
