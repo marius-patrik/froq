@@ -4076,7 +4076,7 @@ dependencies = [
 
 [[package]]
 name = "froq-pager"
-version = "0.2.110"
+version = "0.2.111"
 dependencies = [
  "agent-client-protocol",
  "ansi-to-tui",
@@ -4166,7 +4166,7 @@ dependencies = [
 
 [[package]]
 name = "froq-pager-bin"
-version = "0.2.110"
+version = "0.2.111"
 dependencies = [
  "anyhow",
  "clap",
@@ -4487,7 +4487,7 @@ dependencies = [
 
 [[package]]
 name = "froq-shell"
-version = "0.2.110"
+version = "0.2.111"
 dependencies = [
  "agent-client-protocol",
  "anyhow",
@@ -4997,7 +4997,7 @@ dependencies = [
 
 [[package]]
 name = "froq-version"
-version = "0.2.110"
+version = "0.2.111"
 dependencies = [
  "semver",
 ]
