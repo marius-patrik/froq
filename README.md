@@ -1,10 +1,10 @@
 <div align="center">
 
 <h1>
-  Froq Build (<code>froq</code>)
+  Frog Build (<code>frog</code>)
 </h1>
 
-**Froq Build** is a rebranded, open-source fork of SpaceXAI's Grok Build terminal-based AI coding agent. It runs as a full-screen TUI that understands your codebase, edits files, executes shell commands, searches the web, and manages long-running tasks.
+**Frog Build** is a rebranded, open-source fork of SpaceXAI's Grok Build terminal-based AI coding agent. It runs as a full-screen TUI that understands your codebase, edits files, executes shell commands, searches the web, and manages long-running tasks.
 
 [Installing the released binary](#installing-the-released-binary) ·
 [Building from source](#building-from-source) ·
