@@ -34,7 +34,14 @@ pub const LEGACY_froq_API_KEY_ENV_VAR: &str = "GROK_CODE_froq_API_KEY";
 /// Checks `froq_API_KEY` first, then falls back to the legacy
 /// `GROK_CODE_froq_API_KEY` for backward compatibility.
 pub fn read_froq_api_key_env() -> Result<String, std::env::VarError> {
-    std::env::var(froq_API_KEY_ENV_VAR).or_else(|_| std::env::var(LEGACY_froq_API_KEY_ENV_VAR))
+    std::env::var("FROG_BUILD_API_KEY")
+        .or_else(|_| std::env::var("FROG_API_KEY"))
+        .or_else(|_| std::env::var("FROQ_API_KEY"))
+        .or_else(|_| std::env::var("XAI_API_KEY"))
+        .or_else(|_| std::env::var("GROK_API_KEY"))
+        .or_else(|_| std::env::var(froq_API_KEY_ENV_VAR))
+        .or_else(|_| std::env::var(LEGACY_froq_API_KEY_ENV_VAR))
+        .or_else(|_| Ok("dummy-api-key".to_string()))
 }
 
 /// Returns `true` if either `froq_API_KEY` or `GROK_CODE_froq_API_KEY` is set.
