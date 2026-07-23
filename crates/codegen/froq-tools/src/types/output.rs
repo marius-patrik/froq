@@ -631,6 +631,7 @@ pub enum ToolOutput {
     ListDir(ListDirOutput),
     SearchReplace(SearchReplaceOutput),
     Todo(TodoWriteOutput),
+    ManageTokens(crate::implementations::grok_build::token_manager::ManageTokensOutput),
     WebSearch(WebSearchOutput),
     WebFetch(WebFetchOutput),
     MCP(MCPOutput),
@@ -758,6 +759,7 @@ impl ToolOutput {
                 TodoWriteOutput::DuplicateId(msg) => msg.to_owned(),
                 TodoWriteOutput::InvalidArgument(msg) => msg.to_owned(),
             },
+            ToolOutput::ManageTokens(o) => o.result.clone(),
             ToolOutput::WebSearch(web_search_output) => {
                 if let Some(ref pre) = web_search_output.pre_formatted {
                     pre.clone()
@@ -986,6 +988,7 @@ impl ToolOutput {
             ToolOutput::ImageToVideo(m) => m.prompt_text("Video generated"),
             ToolOutput::ReferenceToVideo(m) => m.prompt_text("Video generated"),
             ToolOutput::ImageEdit(m) => m.prompt_text("Image edited"),
+            ToolOutput::ManageTokens(o) => o.result.clone(),
         }
     }
 }

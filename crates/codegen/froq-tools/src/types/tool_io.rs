@@ -64,6 +64,7 @@ pub enum ToolInput {
     Grep(GrepSearchInput),
     ListDir(ListDirInput),
     TodoWrite(TodoWriteInput),
+    ManageTokens(crate::implementations::grok_build::token_manager::ManageTokensInput),
     Skill(SkillInput),
     MCPTool(MCPToolInput),
     TaskOutput(TaskOutputToolInput),
