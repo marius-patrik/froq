@@ -46,7 +46,7 @@ To sign out, run `grok logout`. It takes no flags and clears your cached credent
 For CI/CD, automation, or environments without browser access, use an API key from [console.x.ai](https://console.x.ai):
 
 ```bash
-export XAI_API_KEY="xai-..."
+export froq_API_KEY="froq-..."
 grok
 ```
 
@@ -257,7 +257,7 @@ Grok resolves credentials for each request in this order, highest to lowest:
 
 1. **Per-model `api_key` or `env_key`** -- set under `[model.<name>]` in `config.toml`. Wins whenever present.
 2. **Active session token** -- obtained through browser, OIDC/OAuth2, or external-provider login and stored in `~/.grok/auth.json`.
-3. **`XAI_API_KEY`** -- fallback when no session token is active.
+3. **`froq_API_KEY`** -- fallback when no session token is active.
 
 When more than one login flow is configured, Grok populates the session token from the first available source, highest to lowest:
 

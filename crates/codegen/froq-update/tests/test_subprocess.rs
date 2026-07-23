@@ -412,7 +412,7 @@ async fn fetch_gh_release_passes_repo_flag() {
     let log = g.args_log();
     assert!(log[0].contains("--repo"), "args: {}", log[0]);
     assert!(
-        log[0].contains("marius-patrik/froq"),
+        log[0].contains("xai-org-shared/grok-build"),
         "args: {}",
         log[0]
     );

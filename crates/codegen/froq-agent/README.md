@@ -1,12 +1,12 @@
-# `xai-grok-agent`
+# `froq-agent`
 
 Agent builder, definition parsing, and system prompt assembly.
 
-This crate extracts a first-class `Agent` type from `xai-grok-shell`.
+This crate extracts a first-class `Agent` type from `froq-shell`.
 An `Agent` bundles tools, system prompt, system-reminder policy,
 compaction policy, and model configuration into a single, portable
 object that any host can consume — whether that host is
-`xai-grok-shell`, another in-process host, or a headless batch runner.
+`froq-shell`, another in-process host, or a headless batch runner.
 
 ## Quick Start
 
@@ -16,8 +16,8 @@ Agent definitions are **Markdown files with YAML frontmatter**, stored
 in `.grok/agents/` (project-level) or `~/.grok/agents/` (user-level).
 
 ```rust
-use xai_grok_agent::{AgentDefinition, AgentBuilder};
-use xai_grok_tools::notification::ToolNotificationHandle;
+use froq_agent::{AgentDefinition, AgentBuilder};
+use froq_tools::notification::ToolNotificationHandle;
 
 // 1. Parse the definition file
 let def = AgentDefinition::from_file(".grok/agents/code-reviewer.md")?;
@@ -48,7 +48,7 @@ let agent = AgentBuilder::new(cwd, None, ToolNotificationHandle::noop())
 ### Discover all definitions
 
 ```rust
-use xai_grok_agent::discovery;
+use froq_agent::discovery;
 
 // Find all .md files in .grok/agents/ directories
 let definitions = discovery::discover(&cwd);
@@ -244,31 +244,31 @@ user-level definition with the same name.
 
 ```
 ┌──────────────────┐
-│  xai-grok-agent  │  ← This crate
+│  froq-agent  │  ← This crate
 │  (Agent, Builder, │
 │   Definition)     │
 └────────┬─────────┘
          │ depends on
          ▼
 ┌──────────────────┐
-│  xai-grok-tools  │
+│  froq-tools  │
 │  (ToolBridge,    │
 │   ToolRegistry,  │
 │   ToolState)     │
 └────────▲─────────┘
          │ depends on
 ┌────────┴─────────┐
-│  xai-grok-shell  │  uses AgentBuilder to create
+│  froq-shell  │  uses AgentBuilder to create
 │  (session host)  │  Agent during session setup
 └──────────────────┘
 ```
 
-- **`xai-grok-tools`**: Provides `ToolBridge`, `ToolRegistry`,
+- **`froq-tools`**: Provides `ToolBridge`, `ToolRegistry`,
   `ToolState`, `SystemReminderLayer`, and tool implementations.
-  `xai-grok-agent` depends on it for tool setup.
-- **`xai-grok-shell`**: The application shell. Uses `AgentBuilder`
+  `froq-agent` depends on it for tool setup.
+- **`froq-shell`**: The application shell. Uses `AgentBuilder`
   to construct an `Agent` during session creation. The shell
-  re-exports some modules from `xai-grok-agent` (AGENTS.md
+  re-exports some modules from `froq-agent` (AGENTS.md
   discovery, skills discovery, base prompt rendering).
 
 ## Built-in Agents
@@ -298,13 +298,13 @@ ones.
 
 ```bash
 # Check
-cargo check -p xai-grok-agent
+cargo check -p froq-agent
 
 # Test
-cargo test -p xai-grok-agent
+cargo test -p froq-agent
 
 # Clippy
-cargo clippy -p xai-grok-agent --fix --allow-dirty
+cargo clippy -p froq-agent --fix --allow-dirty
 
 # Format
 cargo fmt --all

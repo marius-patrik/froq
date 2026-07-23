@@ -1,15 +1,27 @@
 # Changelog
 
+# 0.2.110 — 2026-07-21
+
+## Features
+
+- **Removing MCP servers, plugins, or hook sources** in the Extensions modal now asks for confirmation (press y to proceed).
+
+## Bug Fixes
+
+- **Session creation failures** (including disk full) now show an error message instead of hanging on "Starting session…".
+- **Auto-compact** that fails due to an expired token now lets you log in and automatically retry the compact + original prompt.
+
+
 # 0.2.109 — 2026-07-21
 
 ## Features
 
 - **/usage** now shows token counts and cost for the current session.
-- **grok doctor fix terminal.ssh-wrap** can install the recommended SSH wrapper alias.
+- **grok doctor fix ssh-wrap** can set up `grok wrap ssh` automatically for Bash, zsh, and fish.
 - **[model_providers.<id>]** lets operators share gateway settings across custom models.
 - **Reasoning effort** now accepts `max` as its own tier (above `xhigh`) when the model advertises it.
 - **Queued follow-ups** can now be batched into a single model turn with the new combine_queued_prompts setting.
-- **/doctor** is now the main slash command for terminal, tmux, clipboard and keyboard diagnostics.
+- **/doctor** is now the main in-app command for checking terminal, tmux, clipboard, and keyboard setup.
 - **read_file** now returns full Markdown files inside skills/ directories without truncation.
 
 ## Bug Fixes
@@ -26,7 +38,7 @@
 
 - **Sessions** can now be resumed after moving the working directory or switching machines.
 - **Ctrl+G** in minimal mode opens the current prompt draft in an external editor without sending it; fullscreen keeps the tasks pane.
-- **grok doctor** now shows standalone terminal, tmux, clipboard, and keyboard diagnostics without starting the TUI.
+- **grok doctor** checks terminal, tmux, clipboard, and keyboard setup without opening the TUI.
 
 ## Bug Fixes
 
@@ -859,7 +871,7 @@
 ## Bug Fixes
 
 - **Local MCP servers** now auto-recover after disconnects or session expiry.
-- **OIDC sessions** with XAI_API_KEY present no longer lose refresh on idle.
+- **OIDC sessions** with froq_API_KEY present no longer lose refresh on idle.
 - **Inline video previews** now show an install command only when the package manager is on PATH.
 - **list_dir** now reliably shows all immediate child directories even inside large monorepos.
 - **Clicking a model** in the dashboard /model dropdown no longer opens the wrong session.

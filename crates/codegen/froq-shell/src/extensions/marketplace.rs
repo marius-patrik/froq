@@ -112,49 +112,21 @@ async fn handle_action(agent: &MvpAgent, args: &acp::ExtRequest) -> ExtResult {
 
     let outcome = match req.action {
         MarketplaceAction::Refresh { source_url_or_path } => {
-            // Force re-sync git caches; local sources are re-scanned on next list.
+            // Force re-sync git caches (local sources are re-scanned on next
+            // list). Runs on the blocking pool: git clone/fetch is sync and
+            // can stall for up to its timeout — never run it on the LocalSet.
             let sources = load_filtered_marketplace_sources();
-            let mut refreshed = 0;
-            let mut errors = Vec::new();
-            for source in &sources {
-                if let Some(ref filter) = source_url_or_path {
-                    let identity = match &source.kind {
-                        froq_plugin_marketplace::SourceKind::Local { path } => {
-                            path.display().to_string()
-                        }
-                        froq_plugin_marketplace::SourceKind::Git { url, .. } => url.clone(),
-                    };
-                    if &identity != filter {
-                        continue;
-                    }
-                }
-                if let froq_plugin_marketplace::SourceKind::Git { url, branch } = &source.kind {
-                    let cache_root = froq_plugin_marketplace::git::default_cache_root();
-                    if let Err(e) = froq_plugin_marketplace::git::force_sync_source_cache(
-                        url,
-                        branch.as_deref(),
-                        &cache_root,
-                    ) {
-                        errors.push(format!("{}: {e}", source.name));
-                    }
-                }
-                refreshed += 1;
-            }
-
-            let msg = if errors.is_empty() {
-                format!("Refreshed {refreshed} source(s).")
-            } else {
-                format!(
-                    "Refreshed {refreshed} source(s) with {} error(s): {}",
-                    errors.len(),
-                    errors.join("; ")
-                )
-            };
-            froq_hooks_plugins_types::ActionOutcome {
-                status: froq_hooks_plugins_types::OutcomeStatus::Success,
-                message: msg,
-                requires_reload: false,
-                requires_restart: false,
+            let filter = source_url_or_path;
+            match tokio::task::spawn_blocking(move || refresh_sources(&sources, filter.as_deref()))
+                .await
+            {
+                Ok(outcome) => outcome,
+                Err(e) => froq_hooks_plugins_types::ActionOutcome {
+                    status: froq_hooks_plugins_types::OutcomeStatus::InternalError,
+                    message: format!("Refresh task failed: {e}"),
+                    requires_reload: false,
+                    requires_restart: false,
+                },
             }
         }
         MarketplaceAction::Install {
@@ -176,6 +148,54 @@ async fn handle_action(agent: &MvpAgent, args: &acp::ExtRequest) -> ExtResult {
     };
 
     super::to_ext_response(Ok(outcome))
+}
+
+fn refresh_sources(
+    sources: &[froq_plugin_marketplace::MarketplaceSource],
+    source_url_or_path: Option<&str>,
+) -> froq_hooks_plugins_types::ActionOutcome {
+    let mut refreshed = 0;
+    let mut errors = Vec::new();
+    for source in sources {
+        if let Some(filter) = source_url_or_path {
+            let identity = match &source.kind {
+                froq_plugin_marketplace::SourceKind::Local { path } => {
+                    path.display().to_string()
+                }
+                froq_plugin_marketplace::SourceKind::Git { url, .. } => url.clone(),
+            };
+            if identity != filter {
+                continue;
+            }
+        }
+        if let froq_plugin_marketplace::SourceKind::Git { url, branch } = &source.kind {
+            let cache_root = froq_plugin_marketplace::git::default_cache_root();
+            if let Err(e) = froq_plugin_marketplace::git::force_sync_source_cache(
+                url,
+                branch.as_deref(),
+                &cache_root,
+            ) {
+                errors.push(format!("{}: {e}", source.name));
+            }
+        }
+        refreshed += 1;
+    }
+
+    let msg = if errors.is_empty() {
+        format!("Refreshed {refreshed} source(s).")
+    } else {
+        format!(
+            "Refreshed {refreshed} source(s) with {} error(s): {}",
+            errors.len(),
+            errors.join("; ")
+        )
+    };
+    froq_hooks_plugins_types::ActionOutcome {
+        status: froq_hooks_plugins_types::OutcomeStatus::Success,
+        message: msg,
+        requires_reload: false,
+        requires_restart: false,
+    }
 }
 
 async fn handle_update(
@@ -1448,8 +1468,7 @@ mod official_source_tests {
         assert_eq!(sources[0].name, "my-plugins");
         assert!(matches!(
             &sources[0].kind,
-            froq_plugin_marketplace::SourceKind::Local { path }
-if path == &dir
+            froq_plugin_marketplace::SourceKind::Local { path } if path == &dir
         ));
         // The path must not be mangled into a git URL.
         let raw = std::fs::read_to_string(&config_path).unwrap();

@@ -1,4 +1,4 @@
-# Fuzzing xai-grok-markdown
+# Fuzzing froq-markdown
 
 Coverage-guided fuzzing for the markdown renderer using [cargo-fuzz](https://rust-fuzz.github.io/book/cargo-fuzz.html) (libFuzzer).
 
@@ -21,7 +21,7 @@ Each iteration runs:
 
 ## Running
 
-From `crates/codegen/xai-grok-markdown`:
+From `crates/codegen/froq-markdown`:
 
 ```bash
 # Run indefinitely (Ctrl-C to stop):
