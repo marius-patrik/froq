@@ -1,0 +1,112 @@
+name: Release
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build - ${{ matrix.platform.os-name }}
+    runs-on: ${{ matrix.platform.runs-on }}
+    strategy:
+      matrix:
+        platform:
+          - os-name: Linux-x86_64
+            runs-on: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+            bin-name: froq
+          - os-name: macOS-x86_64
+            runs-on: macos-13
+            target: x86_64-apple-darwin
+            bin-name: froq
+          - os-name: macOS-aarch64
+            runs-on: macos-latest
+            target: aarch64-apple-darwin
+            bin-name: froq
+          - os-name: Windows-x86_64
+            runs-on: windows-latest
+            target: x86_64-pc-windows-msvc
+            bin-name: froq.exe
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Protoc
+        uses: arduino/setup-protoc@v3
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.92.0
+          targets: ${{ matrix.platform.target }}
+
+      - name: Build Binary
+        shell: bash
+        run: |
+          if [ "${{ matrix.platform.runs-on }}" = "windows-latest" ]; then
+            cargo build -p froq-pager-bin --release --target ${{ matrix.platform.target }} \
+              --config profile.release.debug=0 \
+              --config profile.release.strip=true \
+              --config profile.release.incremental=false \
+              --config profile.release.codegen-units=16
+          else
+            cargo build -p froq-pager-bin --release --target ${{ matrix.platform.target }}
+          fi
+
+      - name: Rename and Prepare Binary
+        shell: bash
+        run: |
+          mkdir -p dist
+          src_bin="target/${{ matrix.platform.target }}/release/${{ matrix.platform.bin-name }}"
+          if [ ! -f "$src_bin" ]; then
+            src_bin="target/release/${{ matrix.platform.bin-name }}"
+          fi
+          dst_bin="dist/froq-${{ matrix.platform.target }}"
+          if [ "${{ matrix.platform.runs-on }}" = "windows-latest" ]; then
+            dst_bin="${dst_bin}.exe"
+          fi
+          cp "$src_bin" "$dst_bin"
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: froq-${{ matrix.platform.target }}
+          path: dist/*
+
+  create-release:
+    name: Create Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+
+      - name: Get Version
+        id: get_version
+        shell: bash
+        run: |
+          version=$(grep '^version = ' crates/codegen/froq-pager-bin/Cargo.toml | head -n1 | cut -d'"' -f2)
+          echo "version=$version" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          draft: false
+          prerelease: false
+          files: dist/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
