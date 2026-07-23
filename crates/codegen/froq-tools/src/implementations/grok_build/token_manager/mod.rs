@@ -27,6 +27,14 @@ pub struct ManageTokensInput {
     pub token: Option<String>,
 }
 
+#[derive(Debug, Clone, Serialize, Deserialize, JsonSchema)]
+#[serde(rename_all = "camelCase")]
+pub struct ManageTokensOutput {
+    pub result: String,
+}
+
+impl froq_tool_runtime::ToolOutput for ManageTokensOutput {}
+
 #[derive(Debug, Default)]
 pub struct ManageTokensTool;
 
@@ -50,7 +58,7 @@ impl crate::types::tool_metadata::ToolMetadata for ManageTokensTool {
 
 impl froq_tool_runtime::Tool for ManageTokensTool {
     type Args = ManageTokensInput;
-    type Output = String;
+    type Output = ManageTokensOutput;
 
     fn id(&self) -> froq_tool_protocol::ToolId {
         froq_tool_protocol::ToolId::new(MANAGE_TOKENS_TOOL_NAME).expect("valid tool id")
@@ -69,7 +77,7 @@ impl froq_tool_runtime::Tool for ManageTokensTool {
     fn capabilities(&self) -> froq_tool_protocol::ToolCapabilities {
         froq_tool_protocol::ToolCapabilities {
             is_read_only: false,
-            tool_scope: Some(froq_tool_protocol::ToolScope::ReadWrite),
+            tool_scope: Some(froq_tool_protocol::ToolScope::Write),
             ..Default::default()
         }
     }
@@ -78,36 +86,42 @@ impl froq_tool_runtime::Tool for ManageTokensTool {
         &self,
         _ctx: froq_tool_runtime::ToolCallContext,
         input: ManageTokensInput,
-    ) -> Result<String, froq_tool_runtime::ToolError> {
+    ) -> Result<ManageTokensOutput, froq_tool_runtime::ToolError> {
         let action = input.action.to_lowercase();
-        match action.as_str() {
-            "list" | "status" => Ok(format_token_status()),
+        let message = match action.as_str() {
+            "list" | "status" => format_token_status(),
             "get" => {
                 let provider = input.provider.as_deref().unwrap_or("all");
                 if provider == "all" {
-                    Ok(format_token_status())
+                    format_token_status()
                 } else {
                     let (env_var, val) = get_provider_var(provider);
                     match val {
-                        Some(key) => Ok(format!("{provider} ({env_var}): {}", mask_key(&key))),
-                        None => Ok(format!("{provider} ({env_var}): Not set")),
+                        Some(key) => format!("{provider} ({env_var}): {}", mask_key(&key)),
+                        None => format!("{provider} ({env_var}): Not set"),
                     }
                 }
             }
             "set" => {
                 let Some(provider) = input.provider.as_deref() else {
-                    return Ok("Error: 'provider' parameter is required for action='set'".to_string());
+                    return Ok(ManageTokensOutput {
+                        result: "Error: 'provider' parameter is required for action='set'".to_string(),
+                    });
                 };
                 let Some(token) = input.token.as_deref() else {
-                    return Ok("Error: 'token' parameter is required for action='set'".to_string());
+                    return Ok(ManageTokensOutput {
+                        result: "Error: 'token' parameter is required for action='set'".to_string(),
+                    });
                 };
 
                 let env_var = match resolve_env_var_name(provider) {
                     Some(v) => v,
                     None => {
-                        return Ok(format!(
-                            "Error: Unknown provider '{provider}'. Supported: openai, anthropic, kimi, google, github, groq, xai"
-                        ));
+                        return Ok(ManageTokensOutput {
+                            result: format!(
+                                "Error: Unknown provider '{provider}'. Supported: openai, anthropic, kimi, google, github, groq, xai"
+                            ),
+                        });
                     }
                 };
 
@@ -115,21 +129,25 @@ impl froq_tool_runtime::Tool for ManageTokensTool {
                     std::env::set_var(env_var, token);
                 }
 
-                Ok(format!(
+                format!(
                     "Successfully configured {env_var} for '{provider}' ({})",
                     mask_key(token)
-                ))
+                )
             }
             "delete" | "clear" | "unset" => {
                 let Some(provider) = input.provider.as_deref() else {
-                    return Ok("Error: 'provider' parameter is required for action='delete'".to_string());
+                    return Ok(ManageTokensOutput {
+                        result: "Error: 'provider' parameter is required for action='delete'".to_string(),
+                    });
                 };
                 let env_var = match resolve_env_var_name(provider) {
                     Some(v) => v,
                     None => {
-                        return Ok(format!(
-                            "Error: Unknown provider '{provider}'. Supported: openai, anthropic, kimi, google, github, groq, xai"
-                        ));
+                        return Ok(ManageTokensOutput {
+                            result: format!(
+                                "Error: Unknown provider '{provider}'. Supported: openai, anthropic, kimi, google, github, groq, xai"
+                            ),
+                        });
                     }
                 };
 
@@ -137,12 +155,14 @@ impl froq_tool_runtime::Tool for ManageTokensTool {
                     std::env::remove_var(env_var);
                 }
 
-                Ok(format!("Cleared {env_var} for '{provider}'"))
+                format!("Cleared {env_var} for '{provider}'")
             }
-            other => Ok(format!(
+            other => format!(
                 "Unknown action '{other}'. Valid actions: list, get, set, delete"
-            )),
-        }
+            ),
+        };
+
+        Ok(ManageTokensOutput { result: message })
     }
 }
 
