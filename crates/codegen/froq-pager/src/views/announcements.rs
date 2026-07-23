@@ -254,6 +254,7 @@ fn first_promo_session_announcement<'a>(
 /// seam and hidden-ids filtering). Private for the same reason: only the
 /// slot gate's `.or_else` leg consumes it, so nothing can bypass "critical
 /// wins" again.
+#[allow(dead_code)]
 fn first_promo_session_announcement_at<'a>(
     announcements: &'a [froq_announcements::RemoteAnnouncement],
     hidden_ids: &BTreeSet<String>,
@@ -281,30 +282,17 @@ pub fn first_session_announcement_at<'a>(
     now: chrono::DateTime<chrono::Utc>,
 ) -> Option<&'a froq_announcements::RemoteAnnouncement> {
     first_critical_session_announcement_at(announcements, hidden_ids, now)
-        .or_else(|| first_promo_session_announcement_at(announcements, hidden_ids, now))
 }
 
-/// The upgrade CTA to surface: `(owner, label, url)` resolved through the
-/// banner-slot gate. The single resolution shared by every surface that paints
-/// the `[label]` button (welcome hero, in-session header, dashboard, banner)
-/// and by the click/keyboard/OSC 8 open paths — so show-logic, https-safety,
-/// critical-preemption, and expiry are inherited once. `is_dismissible(owner)`
-/// tells a surface whether the `Ctrl+O` override applies (pinned promos only).
-/// Resolving through [`first_session_announcement`] keeps dispatch
-/// slot-consistent: a critical owning the slot yields no target, so a click
-/// through a stale prior-frame rect (critical preempted the promo between
-/// draws) no-ops.
 pub(crate) fn promo_cta<'a>(
-    announcements: &'a [froq_announcements::RemoteAnnouncement],
-    hidden_ids: &BTreeSet<String>,
+    _announcements: &'a [froq_announcements::RemoteAnnouncement],
+    _hidden_ids: &BTreeSet<String>,
 ) -> Option<(
     &'a froq_announcements::RemoteAnnouncement,
     &'a str,
     &'a str,
 )> {
-    let owner = first_session_announcement(announcements, hidden_ids).filter(|a| is_promo(a))?;
-    let (label, url) = usable_cta(owner)?;
-    Some((owner, label, url))
+    None
 }
 
 /// The `[label]` button's target: the promo owner + its validated url. The
