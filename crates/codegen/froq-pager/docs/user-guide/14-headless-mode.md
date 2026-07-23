@@ -453,15 +453,15 @@ Key environment variables that affect headless mode:
 
 | Variable                        | Description                                                   |
 | ------------------------------- | ------------------------------------------------------------- |
-| `XAI_API_KEY`        | API key for authentication (required when no browser login)   |
+| `froq_API_KEY`        | API key for authentication (required when no browser login)   |
 | `GROK_HOME`                    | Override config directory (default: `~/.grok`)                |
 | `GROK_LOG_FILE`                | Path to a log file (used verbatim as the path; works in headless and TUI, honors `RUST_LOG`) |
 | `RUST_LOG`                     | Log level filter (e.g. `debug`). Headless logs to stderr.     |
 
-For CI environments without browser access, set `XAI_API_KEY` with an API key from [console.x.ai](https://console.x.ai):
+For CI environments without browser access, set `froq_API_KEY` with an API key from [console.x.ai](https://console.x.ai):
 
 ```bash
-export XAI_API_KEY="xai-..."
+export froq_API_KEY="froq-..."
 grok -p "Run the test suite" --yolo
 ```
 
@@ -482,7 +482,7 @@ grok -p "Run the test suite" --yolo
 
 For headless use, authenticate with one of:
 
-- **`XAI_API_KEY`** — simplest for CI. See [Environment Variables](#environment-variables-for-headless) above.
+- **`froq_API_KEY`** — simplest for CI. See [Environment Variables](#environment-variables-for-headless) above.
 - **`grok login --device-auth`** (or `--device-code`) — no browser needed on the target machine.
   See [Authentication > Device Code Flow](02-authentication.md#device-code-flow).
 - **`grok login`** — browser-based OAuth2 on machines with a GUI.
@@ -535,12 +535,12 @@ Grok stores data in `~/.grok` (override with `GROK_HOME`; see [Environment Varia
 
 For containers or CI, mount `~/.grok` read-only:
 
-- Pre-populate `auth.json` or use `XAI_API_KEY`
+- Pre-populate `auth.json` or use `froq_API_KEY`
 - Session persistence fails silently (ephemeral)
 - Update checks log a warning and skip
 
 ```bash
-export XAI_API_KEY="xai-..."
+export froq_API_KEY="froq-..."
 export GROK_DISABLE_AUTOUPDATER=1
 grok -p "..." --no-auto-update
 ```

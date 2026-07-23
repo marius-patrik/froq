@@ -23,6 +23,22 @@ pub(crate) fn noop_observability_bridge() -> froq_computer_hub_sdk::Observabilit
 pub(crate) async fn test_agent_default() -> froq_agent::Agent {
     test_agent_with_tools(vec![]).await
 }
+#[cfg(test)]
+pub(crate) async fn test_agent_backend_search(
+    hosted_tools: Vec<froq_sampling_types::HostedTool>,
+) -> froq_agent::Agent {
+    let base = test_agent_default().await;
+    froq_agent::Agent::new(
+        base.definition().clone(),
+        froq_agent::PromptContext::default(),
+        String::new(),
+        base.tool_bridge().clone(),
+        froq_agent::ReminderPolicy::default(),
+        froq_agent::CompactionPolicy::default(),
+        hosted_tools,
+        true,
+    )
+}
 /// Like [`test_agent_default`] but registers the `update_goal` tool so
 /// `command_availability().goal` is satisfied and `/goal …` slash commands
 /// resolve to their builtins when a turn is driven through `handle_prompt`.
@@ -65,6 +81,22 @@ pub(crate) async fn test_agent_with_tools(
             behavior_preset: None,
         },
         froq_agent::AgentDefinition::default_grok_build(),
+        std::sync::Arc::new(froq_tools::computer::local::LocalTerminalBackend::new()),
+    )
+    .await
+}
+#[cfg(test)]
+pub(crate) async fn test_agent_with_user_message_template(
+    template: froq_agent::prompt::user_message::UserMessageTemplate,
+) -> froq_agent::Agent {
+    let mut definition = froq_agent::AgentDefinition::default_grok_build();
+    definition.user_message_template = template;
+    test_agent_from_config(
+        froq_tools::registry::types::ToolServerConfig {
+            tools: vec![],
+            behavior_preset: None,
+        },
+        definition,
         std::sync::Arc::new(froq_tools::computer::local::LocalTerminalBackend::new()),
     )
     .await
@@ -225,6 +257,8 @@ pub(crate) async fn create_test_actor_ex(
         )),
         telemetry_enabled: false,
         supports_backend_search: std::cell::Cell::new(false),
+        tool_overrides: std::cell::RefCell::new(None),
+        resolved_tool_overrides: std::sync::Arc::new(arc_swap::ArcSwapOption::empty()),
         compactions_remaining: std::cell::Cell::new(None),
         compaction_at_tokens: std::cell::Cell::new(None),
         doom_loop_recovery: None,
@@ -342,6 +376,7 @@ pub(crate) async fn create_test_actor_ex(
         deferred_prefix: TaskSlot::new(),
         extension_registry: froq_agent_lifecycle::LocalExtensionRegistry::default(),
         last_announced_local_date: std::cell::Cell::new(chrono::Local::now().date_naive()),
+        prefix_carries_fallback_date: std::cell::Cell::new(false),
         last_search_prompt_index: std::sync::atomic::AtomicI64::new(-1),
         last_api_request_at: std::sync::atomic::AtomicI64::new(0),
         hook_registry: std::cell::RefCell::new(None),
@@ -426,6 +461,7 @@ pub(crate) fn user_item_with_rx(
         json_schema: None,
         origin: crate::session::PromptOrigin::User,
         task_wake_fallback: None,
+        tool_overrides_update: None,
         respond_to,
         persist_ack: None,
         parsed_prompt_tx: None,
@@ -467,6 +503,7 @@ pub(crate) fn input_with_origin_rx(
         json_schema: None,
         origin,
         task_wake_fallback: None,
+        tool_overrides_update: None,
         respond_to,
         persist_ack: None,
         parsed_prompt_tx: None,

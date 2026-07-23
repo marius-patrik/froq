@@ -2,9 +2,9 @@
 
 <h1>
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="https://media.x.ai/v1/website/spacexai-symbol-white-transparent-0c31957f.png">
-    <source media="(prefers-color-scheme: light)" srcset="https://media.x.ai/v1/website/spacexai-symbol-black-transparent-6435cf42.png">
-    <img alt="SpaceXAI logo" src="https://media.x.ai/v1/website/spacexai-symbol-black-transparent-6435cf42.png" width="96">
+    <source media="(prefers-color-scheme: dark)" srcset="https://media.x.ai/v1/website/spacefroq-symbol-white-transparent-0c31957f.png">
+    <source media="(prefers-color-scheme: light)" srcset="https://media.x.ai/v1/website/spacefroq-symbol-black-transparent-6435cf42.png">
+    <img alt="SpaceXAI logo" src="https://media.x.ai/v1/website/spacefroq-symbol-black-transparent-6435cf42.png" width="96">
   </picture>
   <br>
   Grok Build (<code>grok</code>)
@@ -73,14 +73,14 @@ Requirements:
   and not currently tested from this tree.
 
 ```sh
-cargo run -p xai-grok-pager-bin              # build + launch the TUI
-cargo build -p xai-grok-pager-bin --release  # release binary: target/release/xai-grok-pager
-cargo check -p xai-grok-pager-bin            # fast validation
+cargo run -p froq-pager-bin              # build + launch the TUI
+cargo build -p froq-pager-bin --release  # release binary: target/release/froq-pager
+cargo check -p froq-pager-bin            # fast validation
 ```
 
-The binary artifact is named `xai-grok-pager`; official installs ship it as
+The binary artifact is named `froq-pager`; official installs ship it as
 `grok`. On first launch it opens your browser to authenticate — see the
-[authentication guide](crates/codegen/xai-grok-pager/docs/user-guide/02-authentication.md).
+[authentication guide](crates/codegen/froq-pager/docs/user-guide/02-authentication.md).
 
 ## Documentation
 
@@ -88,7 +88,7 @@ Full online documentation is available at
 [docs.x.ai/build/overview](https://docs.x.ai/build/overview).
 
 The user guide ships with the pager crate:
-[`crates/codegen/xai-grok-pager/docs/user-guide/`](crates/codegen/xai-grok-pager/docs/user-guide/)
+[`crates/codegen/froq-pager/docs/user-guide/`](crates/codegen/froq-pager/docs/user-guide/)
 — getting started, keyboard shortcuts, slash commands, configuration, theming,
 MCP servers, skills, plugins, hooks, headless mode, sandboxing, and more.
 
@@ -96,11 +96,11 @@ MCP servers, skills, plugins, hooks, headless mode, sandboxing, and more.
 
 | Path | Contents |
 |------|----------|
-| `crates/codegen/xai-grok-pager-bin` | Composition-root package; builds the `xai-grok-pager` binary |
-| `crates/codegen/xai-grok-pager` | The TUI: scrollback, prompt, modals, rendering |
-| `crates/codegen/xai-grok-shell` | Agent runtime + leader/stdio/headless entry points |
-| `crates/codegen/xai-grok-tools` | Tool implementations (terminal, file edit, search, ...) |
-| `crates/codegen/xai-grok-workspace` | Host filesystem, VCS, execution, checkpoints |
+| `crates/codegen/froq-pager-bin` | Composition-root package; builds the `froq-pager` binary |
+| `crates/codegen/froq-pager` | The TUI: scrollback, prompt, modals, rendering |
+| `crates/codegen/froq-shell` | Agent runtime + leader/stdio/headless entry points |
+| `crates/codegen/froq-tools` | Tool implementations (terminal, file edit, search, ...) |
+| `crates/codegen/froq-workspace` | Host filesystem, VCS, execution, checkpoints |
 | `crates/codegen/...` | The rest of the CLI crate closure (config, MCP, markdown, sandbox, ...) |
 | `crates/common/`, `crates/build/`, `prod/mc/` | Small shared leaf crates pulled in by the closure |
 | `third_party/` | Vendored upstream source (Mermaid diagram stack) — see below |
@@ -114,7 +114,7 @@ MCP servers, skills, plugins, hooks, headless mode, sandboxing, and more.
 
 ```sh
 cargo check -p <crate>        # always target specific crates; full-workspace builds are slow
-cargo test -p xai-grok-config # per-crate tests
+cargo test -p froq-config # per-crate tests
 cargo clippy -p <crate>       # lint config: clippy.toml at the repo root
 cargo fmt --all               # rustfmt.toml at the repo root
 ```
@@ -134,7 +134,7 @@ Third-party and vendored code remains under its original licenses. See:
 - [`THIRD-PARTY-NOTICES`](THIRD-PARTY-NOTICES) — crates.io / git dependencies,
   bundled UI themes, and **in-tree source ports** (including openai/codex and
   sst/opencode tool implementations)
-- [`crates/codegen/xai-grok-tools/THIRD_PARTY_NOTICES.md`](crates/codegen/xai-grok-tools/THIRD_PARTY_NOTICES.md)
+- [`crates/codegen/froq-tools/THIRD_PARTY_NOTICES.md`](crates/codegen/froq-tools/THIRD_PARTY_NOTICES.md)
   — crate-local notice for the codex and opencode ports (license texts +
   Apache §4(b) change notice)
 - [`third_party/NOTICE`](third_party/NOTICE) — vendored Mermaid-stack index

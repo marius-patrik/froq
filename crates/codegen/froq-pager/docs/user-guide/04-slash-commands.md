@@ -2,7 +2,7 @@
 
 Type `/` in the prompt to open the command menu. It fuzzy-matches as you type, and picking a command runs it immediately.
 
-Commands come from two places: **shell builtins**, handled by the agent backend (xai-grok-shell), and **pager builtins**, handled by the TUI frontend (xai-grok-pager). Both show up in the same menu, and any enabled skill with `user-invocable: true` appears there too.
+Commands come from two places: **shell builtins**, handled by the agent backend (froq-shell), and **pager builtins**, handled by the TUI frontend (froq-pager). Both show up in the same menu, and any enabled skill with `user-invocable: true` appears there too.
 
 Every command below lists its aliases where it has them. A few commands only appear when a feature or session state enables them; those cases are called out inline.
 
@@ -35,7 +35,7 @@ Show how the context window is being used: a category breakdown (system prompt, 
 
 ### `/session-info`
 
-Show session details — model, turn count, and context usage. Aliases: `/status`, `/info`.
+Show session details — auth method, model, turn count, and context usage. Aliases: `/status`, `/info`.
 
 ### `/fork`
 
@@ -327,7 +327,7 @@ Open the MCP servers management modal.
 
 ### `/doctor`
 
-Show the read-only terminal diagnostic report — color level, available themes, clipboard routes, live keyboard and screen evidence, and fixes for common issues. Aliases: `/terminal-setup`, `/terminal-check`, `/terminal-info`.
+Check the current session for terminal, clipboard, color, input, notification, and sandbox issues. Doctor shows what it found and how to resolve each issue. Run `/doctor fix` to list available automatic fixes; other findings include manual steps. `/terminal-setup`, `/terminal-check`, and `/terminal-info` remain aliases.
 
 ### `/release-notes`
 

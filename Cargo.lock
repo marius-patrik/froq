@@ -4076,7 +4076,7 @@ dependencies = [
 
 [[package]]
 name = "froq-pager"
-version = "0.2.109"
+version = "0.2.110"
 dependencies = [
  "agent-client-protocol",
  "ansi-to-tui",
@@ -4166,7 +4166,7 @@ dependencies = [
 
 [[package]]
 name = "froq-pager-bin"
-version = "0.2.109"
+version = "0.2.110"
 dependencies = [
  "anyhow",
  "clap",
@@ -4315,13 +4315,13 @@ dependencies = [
  "froq-hooks-plugins-types",
  "froq-tty-utils",
  "fs2",
- "git2",
  "serde",
  "serde_json",
  "tempfile",
  "thiserror 2.0.18",
  "toml",
  "tracing",
+ "wait-timeout",
 ]
 
 [[package]]
@@ -4410,10 +4410,12 @@ version = "0.1.0"
 dependencies = [
  "assert_matches",
  "async-openai",
+ "chrono",
  "froq-compaction",
  "froq-tools",
  "indexmap",
  "reqwest 0.12.24",
+ "schemars 1.0.4",
  "serde",
  "serde_json",
  "thiserror 2.0.18",
@@ -4485,7 +4487,7 @@ dependencies = [
 
 [[package]]
 name = "froq-shell"
-version = "0.2.109"
+version = "0.2.110"
 dependencies = [
  "agent-client-protocol",
  "anyhow",
@@ -4766,8 +4768,10 @@ dependencies = [
  "axum",
  "clap",
  "froq-acp-lib",
+ "froq-tty-utils",
  "futures-util",
  "libc",
+ "portable-pty",
  "reqwest 0.12.24",
  "serde",
  "serde_json",
@@ -4777,6 +4781,7 @@ dependencies = [
  "tokio-util",
  "tracing",
  "tracing-subscriber",
+ "url",
 ]
 
 [[package]]
@@ -4992,7 +4997,7 @@ dependencies = [
 
 [[package]]
 name = "froq-version"
-version = "0.2.109"
+version = "0.2.110"
 dependencies = [
  "semver",
 ]
@@ -5003,6 +5008,7 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "cpal",
+ "froq-tty-utils",
  "futures-util",
  "rustls",
  "serde",
