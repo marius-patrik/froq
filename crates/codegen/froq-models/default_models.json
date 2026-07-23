@@ -8,7 +8,7 @@
       "id": "grok-4.5",
       "model": "grok-4.5",
       "name": "Grok 4.5",
-      "description": "SpaceXAI's new frontier model",
+      "description": "SpaceXAI's frontier model",
       "context_window": 500000,
       "api_backend": "responses",
       "supports_backend_search": false,
@@ -37,6 +37,56 @@
           "description": "Quick, fast implementations"
         }
       ]
+    },
+    {
+      "id": "gpt-4o",
+      "model": "gpt-4o",
+      "name": "OpenAI GPT-4o",
+      "description": "OpenAI Flagship Multimodal Model",
+      "context_window": 128000,
+      "api_backend": "chat_completions",
+      "env_key": "OPENAI_API_KEY",
+      "api_base_url": "https://api.openai.com/v1"
+    },
+    {
+      "id": "claude-3-5-sonnet",
+      "model": "claude-3-5-sonnet-20241022",
+      "name": "Claude 3.5 Sonnet",
+      "description": "Anthropic Sonnet Model",
+      "context_window": 200000,
+      "api_backend": "messages",
+      "env_key": "ANTHROPIC_API_KEY",
+      "api_base_url": "https://api.anthropic.com/v1"
+    },
+    {
+      "id": "gemini-2.5-pro",
+      "model": "gemini-2.5-pro",
+      "name": "Google Gemini 2.5 Pro",
+      "description": "Google Gemini Pro Model",
+      "context_window": 1000000,
+      "api_backend": "chat_completions",
+      "env_key": ["GEMINI_API_KEY", "GOOGLE_API_KEY"],
+      "api_base_url": "https://generativelanguage.googleapis.com/v1beta/openai"
+    },
+    {
+      "id": "kimi-k1.5",
+      "model": "kimi-k1.5",
+      "name": "Kimi K1.5",
+      "description": "Moonshot AI Kimi Model",
+      "context_window": 128000,
+      "api_backend": "chat_completions",
+      "env_key": ["KIMI_API_KEY", "MOONSHOT_API_KEY"],
+      "api_base_url": "https://api.moonshot.cn/v1"
+    },
+    {
+      "id": "llama-3.3-70b",
+      "model": "llama-3.3-70b-versatile",
+      "name": "Groq Llama 3.3 70B",
+      "description": "Groq Ultra-Fast Llama Model",
+      "context_window": 128000,
+      "api_backend": "chat_completions",
+      "env_key": "GROQ_API_KEY",
+      "api_base_url": "https://api.groq.com/openai/v1"
     }
   ]
 }

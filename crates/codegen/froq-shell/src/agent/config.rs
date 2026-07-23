@@ -3718,6 +3718,9 @@ struct DefaultModelJson {
     auto_compact_threshold_percent: Option<u8>,
     #[serde(default)]
     system_prompt_label: Option<String>,
+    api_base_url: Option<String>,
+    env_key: Option<EnvKeys>,
+    api_key: Option<String>,
 }
 fn default_models(endpoints: &EndpointsConfig) -> IndexMap<String, ModelEntryConfig> {
     let root: serde_json::Value = serde_json::from_str(crate::models::DEFAULT_MODELS_JSON)
@@ -3747,8 +3750,8 @@ fn default_models(endpoints: &EndpointsConfig) -> IndexMap<String, ModelEntryCon
             let config = ModelEntryConfig {
                 id: m.id,
                 model: m.model,
-                base_url: endpoints.resolve_inference_base_url(),
-                api_base_url: Some(endpoints.froq_api_base_url.clone()),
+                base_url: m.api_base_url.clone().unwrap_or_else(|| endpoints.resolve_inference_base_url()),
+                api_base_url: m.api_base_url.or_else(|| Some(endpoints.froq_api_base_url.clone())),
                 name: m.name,
                 description: m.description,
                 context_window,
@@ -3762,8 +3765,8 @@ fn default_models(endpoints: &EndpointsConfig) -> IndexMap<String, ModelEntryCon
                 agent_type: m.agent_type,
                 inference_idle_timeout_secs: m.inference_idle_timeout_secs,
                 max_retries: None,
-                api_key: None,
-                env_key: None,
+                api_key: m.api_key,
+                env_key: m.env_key,
                 extra_headers: IndexMap::new(),
                 use_concise: false,
                 hidden: m.hidden,
