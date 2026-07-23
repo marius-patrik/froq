@@ -28,7 +28,7 @@ const CLAUDE_MANAGED_SETTINGS_PATH: &str = "/etc/claude-code/managed-settings.js
 pub fn default_grok_home() -> PathBuf {
     #[allow(deprecated)]
     let home = std::env::home_dir().unwrap_or_else(|| PathBuf::from("."));
-    dunce::canonicalize(&home).unwrap_or(home).join(".grok")
+    dunce::canonicalize(&home).unwrap_or(home).join(".frog-build")
 }
 
 /// Per-user config directory: `$GROK_HOME` or `~/.grok`. Created if needed.
@@ -64,14 +64,14 @@ pub fn grok_application() -> PathBuf {
 
 /// [`grok_application`] under an explicit home instead of `$GROK_HOME`.
 pub fn grok_application_in(home: &std::path::Path) -> PathBuf {
-    let name = if cfg!(windows) { "grok.exe" } else { "grok" };
+    let name = if cfg!(windows) { "frog-build.exe" } else { "frog-build" };
     home.join("bin").join(name)
 }
 
 /// System-wide config directory: `/etc/grok/` on Unix, `None` on Windows.
 pub fn system_config_dir() -> Option<PathBuf> {
     if cfg!(unix) {
-        Some(PathBuf::from("/etc/grok"))
+        Some(PathBuf::from("/etc/frog-build"))
     } else {
         None
     }
@@ -312,7 +312,7 @@ mod tests {
         // canonicalization must yield a plain path. No-op assertion on Unix.
         let home = default_grok_home();
         assert!(!home.to_string_lossy().starts_with(r"\\?\"));
-        assert!(home.ends_with(".grok"));
+        assert!(home.ends_with(".frog-build"));
     }
 
     #[test]
