@@ -1345,10 +1345,12 @@ async fn swap_managed_bin_links(
     bin_dir: &std::path::Path,
 ) -> Result<std::path::PathBuf> {
     let grok_name = if cfg!(windows) { "frog-build.exe" } else { "frog-build" };
+    let frog_alias = if cfg!(windows) { "frog.exe" } else { "frog" };
     let agent_name = if cfg!(windows) { "agent.exe" } else { "agent" };
     let grok_link = bin_dir.join(grok_name);
+    let frog_link = bin_dir.join(frog_alias);
     let agent_link = bin_dir.join(agent_name);
-    let link_paths: [std::path::PathBuf; 2] = [grok_link.clone(), agent_link];
+    let link_paths: [std::path::PathBuf; 3] = [grok_link.clone(), frog_link, agent_link];
 
     // Capture every link up-front so a 2nd-link capture failure can't
     // strand the 1st mid-swap.
