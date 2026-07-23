@@ -38,8 +38,8 @@ fn manual_install_cmd() -> &'static str {
 /// Build a reinstall hint for a known installer type.
 fn reinstall_hint(installer: &str) -> String {
     match installer {
-        "npm" => "Please reinstall via npm:\n  npm i -g @froq-official/grok".to_string(),
-        "gh-release" => "Please reinstall via GitHub Releases:\n  gh release download --repo xai-org-shared/grok-build --pattern 'grok-*' --output grok && chmod +x grok".to_string(),
+        "npm" => "Please reinstall via npm:\n  npm i -g @marius-patrik/frog-build".to_string(),
+        "gh-release" => format!("Please reinstall via GitHub Releases:\n  gh release download --repo {} --pattern 'frog-build-*' --output frog-build && chmod +x frog-build", crate::version::GH_RELEASE_REPO),
         _ => format!("Please reinstall via:\n  {}", manual_install_cmd()),
     }
 }
@@ -1344,7 +1344,7 @@ async fn swap_managed_bin_links(
     binary_path: &std::path::Path,
     bin_dir: &std::path::Path,
 ) -> Result<std::path::PathBuf> {
-    let grok_name = if cfg!(windows) { "grok.exe" } else { "grok" };
+    let grok_name = if cfg!(windows) { "frog-build.exe" } else { "frog-build" };
     let agent_name = if cfg!(windows) { "agent.exe" } else { "agent" };
     let grok_link = bin_dir.join(grok_name);
     let agent_link = bin_dir.join(agent_name);
@@ -2021,12 +2021,12 @@ async fn install_gh_release(target: Option<&str>) -> Result<()> {
     tokio::fs::create_dir_all(&download_dir).await?;
     tokio::fs::create_dir_all(&bin_dir).await?;
 
-    let binary_name = format!("grok-{}-{}", version, platform);
+    let binary_name = format!("frog-build-{}-{}", version, platform);
     let binary_path = download_dir.join(&binary_name);
     let tag = format!("v{}", version);
 
     eprintln!(
-        "  Downloading grok v{} ({}) from GitHub Releases...",
+        "  Downloading frog-build v{} ({}) from GitHub Releases...",
         version, platform
     );
 
@@ -2047,22 +2047,22 @@ async fn install_gh_release(target: Option<&str>) -> Result<()> {
     // resolve to the newly installed version.
     #[cfg(unix)]
     {
-        let latest_path = download_dir.join("grok-latest");
+        let latest_path = download_dir.join("frog-build-latest");
         let rel_target = relative_symlink_target(&binary_path, &latest_path);
         if let Err(e) = atomic_symlink_swap(&rel_target, &latest_path).await {
-            tracing::warn!("Failed to update grok-latest symlink: {e}");
+            tracing::warn!("Failed to update frog-build-latest symlink: {e}");
         }
     }
 
-    // Also update /usr/local/bin/{grok,agent} if either points directly into
-    // ~/.grok/downloads/ (legacy layout — skips the grok-latest indirection).
+    // Also update /usr/local/bin/{frog-build,agent} if either points directly into
+    // ~/.frog-build/downloads/ (legacy layout — skips the frog-build-latest indirection).
     // Permission errors ignored.
     #[cfg(unix)]
-    for name in ["grok", "agent"] {
+    for name in ["frog-build", "agent"] {
         let system_link = std::path::PathBuf::from(format!("/usr/local/bin/{name}"));
         if let Ok(existing_target) = tokio::fs::read_link(&system_link).await {
             let target_str = existing_target.to_string_lossy();
-            if target_str.contains(".grok/downloads/") && !target_str.ends_with("grok-latest") {
+            if target_str.contains(".frog-build/downloads/") && !target_str.ends_with("frog-build-latest") {
                 // Try to update; ignore permission errors
                 let _ = atomic_symlink_swap(&binary_path, &system_link).await;
             }
